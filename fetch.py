@@ -83,7 +83,7 @@ def yield_all_entries(date_filter):
 
 
 def main():
-    """Entry point"""
+    """Entry point. Returns number of saved entries."""
     last_downloaded_entry_date = db.execute(
         'SELECT max(date) as "maxdate [date]" FROM entries'
     ).fetchone()[0]
@@ -94,6 +94,7 @@ def main():
             "INSERT INTO entries (date, title, url, size) VALUES (?, ?, ?, ?)", entry
         )
     db.commit()
+    return db.total_changes
 
 
 if __name__ == "__main__":
