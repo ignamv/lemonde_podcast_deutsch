@@ -93,7 +93,7 @@ def main():
         db.execute(
             "INSERT INTO entries (date, title, url, size) VALUES (?, ?, ?, ?)", entry
         )
-        db.commit()
+    db.commit()
 
 
 if __name__ == "__main__":
