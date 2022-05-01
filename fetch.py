@@ -34,7 +34,7 @@ def parse_months(body):
         if not match:
             continue
         year, month, day = map(int, match.groups())
-        date = datetime.datetime(year, month, day)
+        date = datetime.date(year, month, day)
         ret.append((date, BASE_URL + match.group(0)))
     return ret
 
@@ -70,7 +70,7 @@ def yield_all_entries(date_filter):
 
     Yields (date, title, media url, size) tuples
 
-    `date_filter` receives a `datetime.datetime` and must return True if the issue is
+    `date_filter` receives a `datetime.date` and must return True if the issue is
     to be downloaded
     """
     for date, url in sorted(parse_months(fetch_months())):
@@ -84,9 +84,9 @@ def yield_all_entries(date_filter):
 
 def main():
     """Entry point"""
-    last_downloaded_entry_date = datetime.datetime.fromisoformat(
-        db.execute("SELECT max(date) FROM entries").fetchone()[0]
-    )
+    last_downloaded_entry_date = db.execute(
+        'SELECT max(date) as "maxdate [date]" FROM entries'
+    ).fetchone()[0]
     date_filter = lambda date: date > last_downloaded_entry_date
     for entry in yield_all_entries(date_filter):
         print(entry)

@@ -16,7 +16,7 @@ def generate_podcast_from_db():
         website="https://monde-diplomatique.de",
         explicit=False,
     )
-
+    midnight = datetime.time(tzinfo=datetime.timezone.utc)
     with get_db() as conn:
         conn.row_factory = sqlite3.Row
         for row in conn.execute(
@@ -25,9 +25,7 @@ def generate_podcast_from_db():
             episode = Episode(
                 title=row["title"],
                 media=Media(row["url"], row["size"]),
-                publication_date=datetime.datetime.fromisoformat(
-                    row["date"] + "+00:00"
-                ),
+                publication_date=datetime.datetime.combine(row["date"], midnight),
             )
             podcast.episodes.append(episode)
     return podcast
