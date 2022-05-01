@@ -1,5 +1,4 @@
 """Generate podcast feed from database"""
-import sqlite3
 import datetime
 from podgen import Podcast, Episode, Media
 from db import get_db
@@ -18,7 +17,6 @@ def generate_podcast_from_db():
     )
     midnight = datetime.time(tzinfo=datetime.timezone.utc)
     with get_db() as conn:
-        conn.row_factory = sqlite3.Row
         for row in conn.execute(
             "SELECT date, title, url, size FROM entries ORDER BY date DESC"
         ):

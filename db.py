@@ -22,4 +22,5 @@ def get_db():
     conn = sqlite3.connect(
         "db/db.sqlite3", detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
     )
+    conn.row_factory = sqlite3.Row
     return conn
