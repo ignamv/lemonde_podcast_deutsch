@@ -2,8 +2,12 @@
 import re
 import datetime
 import requests
+from logging import getLogger, basicConfig
 from bs4 import BeautifulSoup
 from db import get_db
+
+
+logger = getLogger(__name__)
 
 BASE_URL = "https://monde-diplomatique.de"
 
@@ -14,6 +18,7 @@ db = get_db()
 def fetch_months():
     """Fetch HTML for index with links to monthly issues"""
     months_url = BASE_URL + "/archiv-audio"
+    logger.info('Fetched months index at %s', months_url)
     return session.get(months_url).text
 
 
@@ -41,6 +46,7 @@ def parse_months(body):
 
 def fetch_month(url):
     """Fetch HTML for the index of a single issue"""
+    logger.info('Fetched month index at %s', url)
     return session.get(url).text
 
 
@@ -76,9 +82,9 @@ def yield_all_entries(date_filter):
     for date, url in sorted(parse_months(fetch_months())):
         if not date_filter(date):
             continue
-        print(date)
         for title, mediaurl in parse_month(fetch_month(url)):
             size = fetch_size(mediaurl)
+            logger.info('Fetched entry %s %s', date, title)
             yield date, title, mediaurl, size
 
 
@@ -89,11 +95,11 @@ def main():
     ).fetchone()[0]
     date_filter = lambda date: date > last_downloaded_entry_date
     for entry in yield_all_entries(date_filter):
-        print(entry)
         db.execute(
             "INSERT INTO entries (date, title, url, size) VALUES (?, ?, ?, ?)", entry
         )
     db.commit()
+    logger.info('Wrote %s rows into database', db.total_changes)
     return db.total_changes
 
 

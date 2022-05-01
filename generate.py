@@ -1,7 +1,11 @@
 """Generate podcast feed from database"""
 import datetime
+from logging import getLogger, basicConfig
 from podgen import Podcast, Episode, Media
 from db import get_db
+
+
+logger = getLogger(__name__)
 
 
 def generate_podcast_from_db():
@@ -32,8 +36,10 @@ def generate_podcast_from_db():
 def main():
     """Entry point"""
     podcast = generate_podcast_from_db()
-    podcast.rss_file("output/debug.xml", minimize=False)
-    podcast.rss_file("output/feed.xml", minimize=True)
+    for name, minimize in (('debug', False), ('feed', True)):
+        filename = f"output/{name}.xml"
+        podcast.rss_file(filename, minimize=False)
+        logger.info('Generated feed at %s', filename)
 
 
 if __name__ == "__main__":
