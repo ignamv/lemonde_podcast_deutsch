@@ -36,3 +36,7 @@ def main():
     podcast = generate_podcast_from_db()
     podcast.rss_file("output/debug.xml", minimize=False)
     podcast.rss_file("output/feed.xml", minimize=True)
+
+
+if __name__ == "__main__":
+    main()
