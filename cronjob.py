@@ -1,11 +1,8 @@
 """Fetch new entries, if necessary regenerate feed and upload"""
-
-import os
-from pathlib import Path
-from subprocess import check_call
-from fetch import main as fetch_entries
-from generate import main as generate_feed
 from logging import getLogger, basicConfig, INFO
+from fetch_to_database import fetch_entries_to_database
+from generate import generate_feed
+from upload_feed import upload_feed
 
 
 logger = getLogger(__name__)
@@ -13,19 +10,13 @@ logger = getLogger(__name__)
 
 def main():
     """Entry point"""
-    basicConfig(level=INFO, format='%(levelname)s %(name)s %(asctime)s %(message)s')
-    changes = fetch_entries()
+    basicConfig(level=INFO, format="%(levelname)s %(name)s %(asctime)s %(message)s")
+    changes = fetch_entries_to_database()
     if not changes:
-        logger.info('No new entries, exiting')
+        logger.info("No new entries, exiting")
         return
     generate_feed()
-    logger.info('Uploading new feed')
-    rootdir = Path(__file__).resolve().parent
-    os.chdir(rootdir / "output")
-    check_call(["git", "add", "feed.xml"])
-    check_call(["git", "commit", "--amend", "-m", "Initial commit"])
-    check_call(["git", "push", "--force"])
-    logger.info('New feed uploaded')
+    upload_feed()
 
 
 if __name__ == "__main__":

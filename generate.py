@@ -1,11 +1,12 @@
 """Generate podcast feed from database"""
 import datetime
-from logging import getLogger, basicConfig
-from podgen import Podcast, Episode, Media
-from db import get_db
+from logging import getLogger
+from podgen import Podcast, Episode, Media, Person
+from db import get_all_articles
 
 
 logger = getLogger(__name__)
+__all__ = ["generate_feed"]
 
 
 def generate_podcast_from_db():
@@ -13,34 +14,37 @@ def generate_podcast_from_db():
     podcast = Podcast(
         name="Le Monde Diplomatique Deutsch",
         description=(
-            "LMd auf die Ohren: In unserem Audioarchiv können Sie sich alle Ausgaben "
-            "der Zeitung seit Juni 2011 vorlesen lassen."
+            "LE MONDE diplomatique, die große Monatszeitung für "
+            "internationale Politik und Wirtschaft"
         ),
         website="https://monde-diplomatique.de",
+        image="https://monde-diplomatique.de/images/logos/LE-MONDE-diplomatique-logo-short.png",
+        language="de",
         explicit=False,
     )
     midnight = datetime.time(tzinfo=datetime.timezone.utc)
-    with get_db() as conn:
-        for row in conn.execute(
-            "SELECT date, title, url, size FROM entries ORDER BY date DESC"
-        ):
-            episode = Episode(
-                title=row["title"],
-                media=Media(row["url"], row["size"]),
-                publication_date=datetime.datetime.combine(row["date"], midnight),
-            )
-            podcast.episodes.append(episode)
+    for row in get_all_articles():
+        episode = Episode(
+            title=row["title"],
+            summary=row["summary"],
+            authors=[Person(author) for author in row["authors"]],
+            image=row["image_url"],
+            link=row["article_url"],
+            media=Media(row["audio_url"], row["audio_size"]),
+            publication_date=datetime.datetime.combine(row["date"], midnight),
+        )
+        podcast.episodes.append(episode)
     return podcast
 
 
-def main():
+def generate_feed():
     """Entry point"""
     podcast = generate_podcast_from_db()
-    for name, minimize in (('debug', False), ('feed', True)):
+    for name, minimize in (("debug", False), ("feed", True)):
         filename = f"output/{name}.xml"
-        podcast.rss_file(filename, minimize=False)
-        logger.info('Generated feed at %s', filename)
+        podcast.rss_file(filename, minimize=minimize)
+        logger.info("Generated feed at %s", filename)
 
 
 if __name__ == "__main__":
-    main()
+    generate_feed()
