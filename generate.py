@@ -24,6 +24,8 @@ def generate_podcast_from_db():
     )
     midnight = datetime.time(tzinfo=datetime.timezone.utc)
     for row in get_all_articles():
+        if not row["title"]:
+            continue
         episode = Episode(
             title=row["title"],
             summary=row["summary"],
