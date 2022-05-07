@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Generate podcast feed from database"""
 import datetime
 from logging import getLogger

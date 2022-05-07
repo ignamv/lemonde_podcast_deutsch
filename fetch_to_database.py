@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Fetch articles and save them to the database"""
 import datetime
 import logging

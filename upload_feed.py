@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Upload feed"""
 import os
 from pathlib import Path
