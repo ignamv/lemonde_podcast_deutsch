@@ -3,7 +3,8 @@ import datetime
 from pathlib import Path
 import logging
 import time
-from requests import Session
+from requests import Session, Response
+from db import get_cached_url_size, save_cached_url_size
 
 session = Session()
 logger = logging.getLogger(__name__)
@@ -22,7 +23,7 @@ __all__ = [
 class BackOff:
     """Rate limiter"""
 
-    def __init__(self, delay):
+    def __init__(self, delay: int):
         self.delay = delay
         self.last_request = None
 
@@ -38,7 +39,7 @@ class BackOff:
 back_off = BackOff(delay=3)
 
 
-def make_url_absolute(url):
+def make_url_absolute(url: str) -> str:
     """Add domain name to url if necessary"""
     base_url = "https://monde-diplomatique.de"
     if url[0] == "/":
@@ -46,21 +47,23 @@ def make_url_absolute(url):
     return url
 
 
-def get(url):
+def get(url: str) -> Response:
     """Log and get url (possibly without domain)"""
     back_off()
     logger.info("GET %s", url)
     return session.get(make_url_absolute(url))
 
 
-def head(url):
+def head(url: str) -> Response:
     """Log and request headers for url (possibly without domain)"""
     back_off()
     logger.info("HEAD %s", url)
     return session.head(make_url_absolute(url))
 
 
-def get_if_not_cached(url, cache_filename, expire=None):
+def get_if_not_cached(
+    url: str, cache_filename: Path, expire: datetime.timedelta = None
+) -> str:
     """Get url contents, or read from cache if available and not expired"""
     if cache_filename.exists():
         last_modified = datetime.datetime.fromtimestamp(cache_filename.stat().st_mtime)
@@ -73,25 +76,31 @@ def get_if_not_cached(url, cache_filename, expire=None):
     return response.text
 
 
-def fetch_issue_index():
+def fetch_issue_index() -> str:
     """Get HTML for text archive issue index"""
     url = "/archiv-text"
     cachefilename = cachedir / "archiv-text.html"
     return get_if_not_cached(url, cachefilename, datetime.timedelta(days=1))
 
 
-def fetch_issue(date, url):
+def fetch_issue(date: datetime.date, url: str) -> str:
     """Get HTML for text archive issue"""
     cachefilename = cachedir / "archiv_text" / date.isoformat()
     return get_if_not_cached(url, cachefilename)
 
 
-def fetch_article(id_, url):
+def fetch_article(id_: int, url: str) -> str:
     """Get HTML for text archive article"""
     cachefilename = cachedir / "archiv_text_articles" / str(id_)
     return get_if_not_cached(url, cachefilename)
 
 
-def get_url_size(url):
+def get_url_size(url: str) -> int:
     """Make HEAD request to get size of file in url"""
-    return int(head(url).headers["Content-length"])
+    try:
+        return get_cached_url_size(url)
+    except KeyError:
+        pass
+    size = int(head(url).headers["Content-length"])
+    save_cached_url_size(url, size)
+    return size

@@ -10,7 +10,8 @@ It implements rate limiting (to avoid loading the server).
 It also caches responses to avoid repeated requests while experimenting.
 
 Database access is handled by `db.py`.
-I use an `sqlite3` database with a single table.
+I use an `sqlite3` database with tables `article`, `author` and `audiofile`.
+The normalization is just for fun, I previously used a single table and that was more practical.
 
 `fetch_entries_to_database.py` parses the issues index, issues and articles and saves everything to the database.
 

@@ -1,0 +1,16 @@
+from typing import List, Optional
+import datetime
+
+class Person:
+    def __init__(self, name: str): ...
+
+class Media:
+    def __init__(self, url: str, size: int): ...
+
+class Episode:
+    def __init__(self, title: str, summary: str, authors: List[Person], image: Optional[str], link: str, media: Media, publication_date: datetime.datetime): ...
+
+class Podcast:
+    def __init__(self, name: str, description: str, website: str, image: str, language: str, explicit: bool): ...
+    def rss_file(self, filename: str, minimize: bool): ...
+    episodes: List[Episode]

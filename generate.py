@@ -4,13 +4,14 @@ import datetime
 from logging import getLogger
 from podgen import Podcast, Episode, Media, Person
 from db import get_all_articles
+from fetching import make_url_absolute
 
 
 logger = getLogger(__name__)
 __all__ = ["generate_feed"]
 
 
-def generate_podcast_from_db():
+def generate_podcast_from_db() -> Podcast:
     """Create podgen.Podcast from database entries"""
     podcast = Podcast(
         name="Le Monde Diplomatique Deutsch",
@@ -24,19 +25,23 @@ def generate_podcast_from_db():
         explicit=False,
     )
     midnight = datetime.time(tzinfo=datetime.timezone.utc)
-    for row in get_all_articles():
-        if not row["title"]:
-            continue
-        episode = Episode(
-            title=row["title"],
-            summary=row["summary"],
-            authors=[Person(author) for author in row["authors"]],
-            image=row["image_url"],
-            link=row["article_url"],
-            media=Media(row["audio_url"], row["audio_size"]),
-            publication_date=datetime.datetime.combine(row["date"], midnight),
-        )
-        podcast.episodes.append(episode)
+    for article in get_all_articles():
+        assert article.summary.title.strip()
+        for urlsize in article.medias:
+            episode = Episode(
+                title=article.summary.title,
+                summary=article.summary.summary,
+                authors=[Person(author) for author in article.summary.authors],
+                image=make_url_absolute(article.image_url)
+                if article.image_url
+                else None,
+                link=make_url_absolute(article.summary.url),
+                media=Media(urlsize.url, urlsize.size),
+                publication_date=datetime.datetime.combine(
+                    article.summary.date, midnight
+                ),
+            )
+            podcast.episodes.append(episode)
     return podcast
 
 
