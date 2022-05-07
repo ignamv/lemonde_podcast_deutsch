@@ -28,8 +28,8 @@ def yield_archive_issues():
 def parse_issue_html(html):
     """Yield (id, url, title, summary, authors) for all articles in issue html"""
     soup = BeautifulSoup(html, "html.parser")
-    ul_tag = soup.find("ul_tag", class_="inhaltsverz verlinkt")
-    for li_tag in ul_tag.find_all("li_tag"):
+    ul_tag = soup.find("ul", class_="inhaltsverz verlinkt")
+    for li_tag in ul_tag.find_all("li"):
         id_ = int(li_tag.attrs["mediasyncid"])
         divs = li_tag.find_all("div")
         titlediv = divs[0]
