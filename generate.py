@@ -20,7 +20,11 @@ def generate_podcast_from_db() -> Podcast:
             "internationale Politik und Wirtschaft"
         ),
         website="https://monde-diplomatique.de",
-        image="https://monde-diplomatique.de/images/logos/LE-MONDE-diplomatique-logo-short.png",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/"
+            "Le_Monde_diplomatique_Deutsche_Ausgabe_%282019-03-07%29.svg/"
+            "563px-Le_Monde_diplomatique_Deutsche_Ausgabe_%282019-03-07%29.svg.png"
+        ),
         language="de",
         explicit=False,
     )

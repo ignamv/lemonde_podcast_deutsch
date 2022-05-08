@@ -2,6 +2,6 @@
 
 set -e
 
-black *.py */*.py
+black *.py
 env MYPYPATH=stubs mypy *.py
-pylint *.py */*.py
+pylint *.py
