@@ -11,6 +11,7 @@ CREATE TABLE author (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT
 );
+CREATE INDEX author_name on author(name);
 CREATE TABLE audiofile (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     mediasyncid INTEGER,
@@ -18,7 +19,6 @@ CREATE TABLE audiofile (
     size INTEGER,
     FOREIGN KEY(mediasyncid) REFERENCES article(mediasyncid)
 );
-CREATE INDEX author_name on author(name);
 CREATE TABLE "article_author" (
     mediasyncid INTEGER,
     author_id INTEGER,
