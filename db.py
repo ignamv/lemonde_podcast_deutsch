@@ -77,7 +77,8 @@ def get_all_articles() -> Iterator[Article]:
         authors_cursor = get_db().execute(
             "SELECT name FROM author JOIN article_author "
             "ON author.id == article_author.author_id "
-            "WHERE article_author.mediasyncid == ?",
+            "WHERE article_author.mediasyncid == ?"
+            "ORDER BY name",
             (article_row["mediasyncid"],),
         )
         authors = [row[0] for row in authors_cursor]
