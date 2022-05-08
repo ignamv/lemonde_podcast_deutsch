@@ -27,6 +27,7 @@ def generate_podcast_from_db() -> Podcast:
         ),
         language="de",
         explicit=False,
+        authors=[Person("Serge Halimi")],
     )
     midnight = datetime.time(tzinfo=datetime.timezone.utc)
     for article in get_all_articles():
