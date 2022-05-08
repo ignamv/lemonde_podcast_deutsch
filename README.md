@@ -1,5 +1,7 @@
 # Listen to Le Monde Diplomatique (Deutsch) as podcast
 
+![Tests](https://github.com/ignamv/lemonde_podcast_deutsch/actions/workflows/check.yml/badge.svg)
+
 These scripts build an RSS feed for the [free audio archive of Le Monde Diplomatique](https://monde-diplomatique.de/archiv-audio).
 You don't need to run them to listen to the podcast. Just point your podcast app to the [feed](https://ignamv.github.io/lemonde_podcast_deutsch/feed.xml).
 
