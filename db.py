@@ -46,6 +46,7 @@ class GetDatabase:
                 detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES,
             )
             self.connection.row_factory = sqlite3.Row
+            self.connection.execute('PRAGMA foreign_keys = ON')
         return self.connection
 
 
